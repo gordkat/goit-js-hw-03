@@ -13,6 +13,10 @@ const Transaction = {
 /*
  * Каждая транзакция это объект со свойствами: id, type и amount
  */
+let id = 0;
+const getId = () => {
+  return id++;
+};
 
 const account = {
   // Текущий баланс счета
@@ -27,7 +31,7 @@ const account = {
    */
   createTransaction(amount, type) {
     return {
-      id: Date.now(),
+      id: getId(),
       amount,
       type,
     };
@@ -40,11 +44,12 @@ const account = {
    * после чего добавляет его в историю транзакций
    */
   deposit(amount) {
+    if (typeof amount !== 'number' || amount <= 0) {
+      console.log('Были введены неправильные данные. Попробуйте еще раз');
+      return;
+    }
     this.balance += amount;
     this.transactions.push(this.createTransaction(amount, Transaction.DEPOSIT));
-    console.log(this.transactions);
-    console.log(this.balance);
-    return this.balance;
   },
 
   /*
@@ -57,6 +62,10 @@ const account = {
    * о том, что снятие такой суммы не возможно, недостаточно средств.
    */
   withdraw(amount) {
+    if (typeof amount !== 'number' || amount <= 0) {
+      console.log('Были введены неправильные данные. Попробуйте еще раз');
+      return;
+    }
     if (amount > this.balance) {
       console.log('Cнятие такой суммы не возможно, недостаточно средств!');
       return;
@@ -65,9 +74,6 @@ const account = {
     this.transactions.push(
       this.createTransaction(amount, Transaction.WITHDRAW),
     );
-    console.log(this.transactions);
-    console.log(this.balance);
-    return this.balance;
   },
 
   /*
@@ -84,6 +90,7 @@ const account = {
     for (const transaction of this.transactions) {
       if (transaction.id === id) return transaction;
     }
+    console.log('Транзакции с таким id не найдено');
     return null;
   },
 
@@ -106,5 +113,15 @@ account.deposit(10);
 account.deposit(300);
 account.withdraw(100);
 account.withdraw(300);
-/* console.log(account.getTransactionDetails(1607601017158)); */
+account.withdraw(3000);
+account.withdraw(false);
+console.log(account.getTransactionDetails(7));
+account.deposit('ldjfcsk');
+account.deposit(true);
+account.deposit(0);
+account.deposit(1000);
+account.withdraw(1400);
 console.log(account.getTransactionTotal(Transaction.DEPOSIT));
+console.log(account.getTransactionTotal(Transaction.WITHDRAW));
+console.log(account.getBalance());
+console.log(account.transactions);
